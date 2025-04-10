@@ -1,8 +1,6 @@
-import { use, useState } from 'react'
-import { Button, Input, Modal, TextInput, useSafeMantineTheme } from '@mantine/core';
-import { } from '@mantine/hooks';
+import { useState } from 'react'
+import { Button, Modal, NativeSelect, TextInput } from '@mantine/core';
 import { v4 as uuidv4 } from 'uuid';
-
 
 function App() {
   const [skills, setSkills] = useState('');
@@ -12,17 +10,20 @@ function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [isDelete, setIsDelete] = useState(false)
   const [deleteId, setDeleteId] = useState(null);
+  const [selectValue, setSelectValue] = useState('Select Category');
 
   const handleAddNewData = () => {
     if (skills.trim() === '') {
       alert("Please Enter Skills")
       return;
     }
-    const objData = { id: uuidv4(), skills }
-    setAddData([...addData, objData])
-    setIsAdding(false)
-    setIsDelete(false)
-    setSkills('')
+    const objData = { id: uuidv4(), skills, category: selectValue };
+
+    setAddData([...addData, objData]);
+    setIsAdding(false);
+    setIsDelete(false);
+    setSkills('');
+    setSelectValue('Select Category');
   }
 
   const handleInputChange = (event) => {
@@ -33,15 +34,17 @@ function App() {
   const handleModalClose = () => {
     setIsAdding(false);
     setIsEditing(false);
-    setSkills('')
+    setSkills('');
     setIsDelete(false);
+    setSelectValue('Select Category');
   }
 
   const handleEditData = (id) => {
     const data = addData.find((ele) => ele.id === id);
     setEditId(id);
     setSkills(data?.skills);
-    setIsEditing(true)
+    setIsEditing(true);
+    setSelectValue(data?.category);
   }
 
   const updateData = () => {
@@ -49,15 +52,20 @@ function App() {
       alert("Please Enter Skills")
       return;
     }
+    if (selectValue === 'Select Category') {
+      alert("Please select a category");
+      return;
+    }
     const updatedData = addData.map((ele) => {
       if (ele.id === editId) {
         return { id: ele.id, skills }
       }
       return ele;
-    })
+    });
     setAddData(updatedData);
-    setSkills('')
+    setSkills('');
     setIsEditing(false);
+    setSelectValue('select Category');
   }
 
   const handleDeleteClick = (id) => {
@@ -65,32 +73,38 @@ function App() {
     setIsDelete(true);
   };
 
-  const handleDeleteData = (id) => {
+  const handleDeleteData = () => {
     const filteredData = addData.filter((ele) =>
       ele.id !== deleteId
-    )
+    );
     setAddData(filteredData);
     setIsDelete(false);
   }
 
+  console.log(addData)
   return (
     <>
       <div className="max-w-md mx-auto p-5 bg-gradient-to-r from-gray-300 to-white-600 rounded-lg shadow-lg ">
         <div className='flex justify-between justify-items-center'>
           <h1 className='text-2xl font-bold mb-3'>Skills</h1>
           <Modal opened={isAdding} onClose={() => { setIsAdding(false) }} title="Add Skills">
-            <TextInput onChange={handleInputChange} value={skills} label="Add Your Skill Here" withAsterisk placeholder="Input placeholder" className='mb-2' />
-            <div className='grid grid-cols-2 gap-5'>
+            <TextInput onChange={handleInputChange} value={skills} withAsterisk placeholder="Add Here" className='mb-2' />
+            <NativeSelect
+              value={selectValue}
+              onChange={(ele) => { setSelectValue(ele.target.value) }}
+              data={['Select Category', 'Frontend', 'Backend']}
+            />
+            <div className='grid grid-cols-2 gap-5 my-2'>
               <Button onClick={handleAddNewData} variant="filled" color="rgba(44, 99, 69, 1)">Add</Button>
               <Button onClick={handleModalClose} variant="filled" color="pink">Cancel</Button>
             </div>
           </Modal>
           <Button onClick={() => { setIsAdding(true) }} variant="default"> + </Button>
         </div>
-        <div className="flex gap-3 mb-3 justify-between">
+        <div className="flex gap-3 mb-3 justify-center items-center">
           <button className='bg-green-900 text-white rounded-xl px-3 py-1'>All</button>
-          <button className='bg-green-900 text-white rounded-xl px-2 py-1'>Industry Knowledge</button>
-          <button className='bg-green-900 text-white rounded-xl px-2 py-1'>Tools & Technologies</button>
+          <button className='bg-green-900 text-white rounded-xl px-2 py-1'>Frontend</button>
+          <button className='bg-green-900 text-white rounded-xl px-2 py-1'>Backend</button>
         </div>
         <Modal opened={isDelete} onClose={() => { setIsDelete(false) }} title="Are you sure?">
           <div className="flex gap-4 justify-end">
@@ -121,7 +135,7 @@ function App() {
             )
           })
         }
-      </div>
+      </div >
     </>
   )
 }
