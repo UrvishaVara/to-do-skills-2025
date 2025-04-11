@@ -1,5 +1,4 @@
 
-
 import { useEffect, useState } from 'react'
 import { Button, Modal, NativeSelect, TextInput } from '@mantine/core';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,13 +23,19 @@ function App() {
       alert("Please Enter Skills")
       return;
     }
+
+    if (selectValue === 'Select Category') {
+      alert("Please select a category");
+      setSkills('');
+      return;
+    }
     const objData = { id: uuidv4(), skills, category: selectValue };
 
     setAddData([...addData, objData]);
     setIsAdding(false);
     setIsDelete(false);
-    setSkills('');
     setSelectValue('Select Category');
+    setSkills('');
   }
 
   const handleInputChange = (event) => {
@@ -59,13 +64,10 @@ function App() {
       alert("Please Enter Skills")
       return;
     }
-    if (selectValue === 'Select Category') {
-      alert("Please select a category");
-      return;
-    }
+
     const updatedData = addData.map((ele) => {
       if (ele.id === editId) {
-        return { id: ele.id, skills }
+        return { id: ele.id, skills, category: selectValue }
       }
       return ele;
     });
@@ -73,6 +75,7 @@ function App() {
     setSkills('');
     setIsEditing(false);
     setSelectValue('select Category');
+
   }
 
   const handleDeleteClick = (id) => {
@@ -98,6 +101,7 @@ function App() {
     }
   }
 
+
   return (
     <>
       <div className="max-w-md mx-auto p-5 bg-gradient-to-r from-gray-300 to-white-600 rounded-lg shadow-lg ">
@@ -122,7 +126,7 @@ function App() {
           <button name='Frontend' onClick={filterDataByCategory} className='bg-green-900 text-white rounded-xl px-2 py-1'>Frontend</button>
           <button name='Backend' onClick={filterDataByCategory} className='bg-green-900 text-white rounded-xl px-2 py-1'>Backend</button>
         </div>
-        <Modal opened={isDelete} onClose={() => { setIsDelete(false) }} title="Are you sure?">
+        <Modal opened={isDelete} onClose={() => { setIsDelete(false) }} title="Are you sure want to delete?">
           <div className="flex gap-4 justify-end">
             <Button onClick={handleDeleteData} color="rgba(44,99,69,1)" variant="default"> Yes </Button>
             <Button onClick={() => { setIsDelete(false) }} variant="filled" color="pink"> No </Button>
@@ -130,13 +134,19 @@ function App() {
         </Modal>
         <Modal opened={isEditing} onClose={handleModalClose} title="Edit Your Skill">
           <TextInput onChange={handleInputChange} value={skills} name='value' type='string' />
+          <NativeSelect
+            className='my-3'
+            value={selectValue}
+            onChange={(ele) => { setSelectValue(ele.target.value) }}
+            data={['Select Category', 'Frontend', 'Backend']}
+          />
           <div className="flex gap-4 justify-end">
             <Button onClick={updateData} color="rgba(44,99,69,1)" variant="default"> Update </Button>
             <Button onClick={handleModalClose} variant="filled" color="pink"> Cancel </Button>
           </div>
         </Modal>
         {
-          categoryData.map((ele) => {
+          categoryData.length === 0 ? <div className='text-center text-xl text-green-700 font-semibold'>No Data available</div> : (categoryData.map((ele) => {
             return (
               <div className='bg-gradient-to-r from-green-600 to-white-600 border border-black rounded-lg shadow-lg p-3 mb-3 text-white' key={ele?.id}>
                 <div className='flex justify-between items-center'>
@@ -149,7 +159,8 @@ function App() {
                 </div>
               </div>
             )
-          })
+          }))
+
         }
       </div >
     </>
