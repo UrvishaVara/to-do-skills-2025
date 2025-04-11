@@ -1,16 +1,23 @@
-import { useState } from 'react'
+
+
+import { useEffect, useState } from 'react'
 import { Button, Modal, NativeSelect, TextInput } from '@mantine/core';
 import { v4 as uuidv4 } from 'uuid';
 
 function App() {
   const [skills, setSkills] = useState('');
   const [addData, setAddData] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
   const [editId, setEditId] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isDelete, setIsDelete] = useState(false)
   const [deleteId, setDeleteId] = useState(null);
   const [selectValue, setSelectValue] = useState('Select Category');
+
+  useEffect(() => {
+    setCategoryData(addData)
+  }, [addData]);
 
   const handleAddNewData = () => {
     if (skills.trim() === '') {
@@ -79,9 +86,18 @@ function App() {
     );
     setAddData(filteredData);
     setIsDelete(false);
+  };
+
+  const filterDataByCategory = (event) => {
+    const categoryName = event.target.name;
+    if (categoryName === "All") {
+      setCategoryData(addData);
+    } else {
+      const filteredData = addData.filter((ele) => ele.category === categoryName);
+      setCategoryData(filteredData);
+    }
   }
 
-  console.log(addData)
   return (
     <>
       <div className="max-w-md mx-auto p-5 bg-gradient-to-r from-gray-300 to-white-600 rounded-lg shadow-lg ">
@@ -102,9 +118,9 @@ function App() {
           <Button onClick={() => { setIsAdding(true) }} variant="default"> + </Button>
         </div>
         <div className="flex gap-3 mb-3 justify-center items-center">
-          <button className='bg-green-900 text-white rounded-xl px-3 py-1'>All</button>
-          <button className='bg-green-900 text-white rounded-xl px-2 py-1'>Frontend</button>
-          <button className='bg-green-900 text-white rounded-xl px-2 py-1'>Backend</button>
+          <button name='All' onClick={filterDataByCategory} className='bg-green-900 text-white rounded-xl px-3 py-1'>All</button>
+          <button name='Frontend' onClick={filterDataByCategory} className='bg-green-900 text-white rounded-xl px-2 py-1'>Frontend</button>
+          <button name='Backend' onClick={filterDataByCategory} className='bg-green-900 text-white rounded-xl px-2 py-1'>Backend</button>
         </div>
         <Modal opened={isDelete} onClose={() => { setIsDelete(false) }} title="Are you sure?">
           <div className="flex gap-4 justify-end">
@@ -120,7 +136,7 @@ function App() {
           </div>
         </Modal>
         {
-          addData.map((ele) => {
+          categoryData.map((ele) => {
             return (
               <div className='bg-gradient-to-r from-green-600 to-white-600 border border-black rounded-lg shadow-lg p-3 mb-3 text-white' key={ele?.id}>
                 <div className='flex justify-between items-center'>
