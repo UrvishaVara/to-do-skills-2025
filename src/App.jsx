@@ -26,7 +26,6 @@ function App() {
 
     if (selectValue === 'Select Category') {
       alert("Please select a category");
-      setSkills('');
       return;
     }
     const objData = { id: uuidv4(), skills, category: selectValue };
@@ -122,9 +121,9 @@ function App() {
           <Button onClick={() => { setIsAdding(true) }} variant="default"> + </Button>
         </div>
         <div className="flex gap-3 mb-3 justify-center items-center">
-          <button name='All' onClick={filterDataByCategory} className='bg-green-900 text-white rounded-xl px-3 py-1'>All</button>
-          <button name='Frontend' onClick={filterDataByCategory} className='bg-green-900 text-white rounded-xl px-2 py-1'>Frontend</button>
-          <button name='Backend' onClick={filterDataByCategory} className='bg-green-900 text-white rounded-xl px-2 py-1'>Backend</button>
+          <button name='All' onClick={filterDataByCategory} className='bg-green-900 hover:bg-yellow-600 active:bg-green-700 focus:outline-none focus:ring focus:ring-yellow-300 ... text-white rounded-xl px-3 py-1'>All</button>
+          <button name='Frontend' onClick={filterDataByCategory} className='bg-green-900 hover:bg-yellow-600 active:bg-green-700 focus:outline-none focus:ring focus:ring-yellow-300 ... text-white rounded-xl px-2 py-1'>Frontend</button>
+          <button name='Backend' onClick={filterDataByCategory} className='bg-green-900 hover:bg-yellow-600 active:bg-green-700 focus:outline-none focus:ring focus:ring-yellow-300 ... text-white rounded-xl px-2 py-1'>Backend</button>
         </div>
         <Modal opened={isDelete} onClose={() => { setIsDelete(false) }} title="Are you sure want to delete?">
           <div className="flex gap-4 justify-end">
