@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 function App() {
   const [skills, setSkills] = useState('');
-  const [addData, setAddData] = useState([]);
+  const [addData, setAddData] = useState(JSON.parse(localStorage.getItem('skills-data')) || skills);
   const [categoryData, setCategoryData] = useState([]);
   const [editId, setEditId] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -13,9 +13,11 @@ function App() {
   const [isDelete, setIsDelete] = useState(false)
   const [deleteId, setDeleteId] = useState(null);
   const [selectValue, setSelectValue] = useState('Select Category');
+  const [activeTab, setActiveTab] = useState('ALL');
 
   useEffect(() => {
-    setCategoryData(addData)
+    setCategoryData(addData);
+    localStorage.setItem('skills-data', JSON.stringify(addData));
   }, [addData]);
 
   const handleAddNewData = () => {
@@ -29,12 +31,12 @@ function App() {
       return;
     }
     const objData = { id: uuidv4(), skills, category: selectValue };
-
     setAddData([...addData, objData]);
     setIsAdding(false);
     setIsDelete(false);
     setSelectValue('Select Category');
     setSkills('');
+
   }
 
   const handleInputChange = (event) => {
@@ -63,7 +65,6 @@ function App() {
       alert("Please Enter Skills")
       return;
     }
-
     const updatedData = addData.map((ele) => {
       if (ele.id === editId) {
         return { id: ele.id, skills, category: selectValue }
@@ -74,7 +75,6 @@ function App() {
     setSkills('');
     setIsEditing(false);
     setSelectValue('select Category');
-
   }
 
   const handleDeleteClick = (id) => {
@@ -87,6 +87,7 @@ function App() {
       ele.id !== deleteId
     );
     setAddData(filteredData);
+    localStorage.setItem('skills-data', JSON.stringify(filteredData));
     setIsDelete(false);
   };
 
@@ -94,19 +95,20 @@ function App() {
     const categoryName = event.target.name;
     if (categoryName === "All") {
       setCategoryData(addData);
+      setActiveTab('ALL')
     } else {
-      const filteredData = addData.filter((ele) => ele.category === categoryName);
+      const filteredData = categoryName === activeTab ? addData : addData.filter((ele) => ele.category === categoryName);
       setCategoryData(filteredData);
+      setActiveTab(categoryName === activeTab ? "All" : categoryName);
+      setSelectValue('select Category');
     }
   }
-
-
   return (
     <>
-      <div className="max-w-md mx-auto p-5 bg-gradient-to-r from-gray-300 to-white-600 rounded-lg shadow-lg ">
+      <div className="max-w-md mx-auto p-5 bg-gradient-to-r from-gray-300 to-white-600 rounded-lg shadow-lg">
         <div className='flex justify-between justify-items-center'>
           <h1 className='text-2xl font-bold mb-3'>Skills</h1>
-          <Modal opened={isAdding} onClose={() => { setIsAdding(false) }} title="Add Skills">
+          <Modal opened={isAdding} onClose={handleModalClose} title="Add Skills">
             <TextInput onChange={handleInputChange} value={skills} withAsterisk placeholder="Add Here" className='mb-2' />
             <NativeSelect
               value={selectValue}
@@ -121,9 +123,9 @@ function App() {
           <Button onClick={() => { setIsAdding(true) }} variant="default"> + </Button>
         </div>
         <div className="flex gap-3 mb-3 justify-center items-center">
-          <button name='All' onClick={filterDataByCategory} className='bg-green-900 hover:bg-yellow-600 active:bg-green-700 focus:outline-none focus:ring focus:ring-yellow-300 ... text-white rounded-xl px-3 py-1'>All</button>
-          <button name='Frontend' onClick={filterDataByCategory} className='bg-green-900 hover:bg-yellow-600 active:bg-green-700 focus:outline-none focus:ring focus:ring-yellow-300 ... text-white rounded-xl px-2 py-1'>Frontend</button>
-          <button name='Backend' onClick={filterDataByCategory} className='bg-green-900 hover:bg-yellow-600 active:bg-green-700 focus:outline-none focus:ring focus:ring-yellow-300 ... text-white rounded-xl px-2 py-1'>Backend</button>
+          <button name='All' onClick={filterDataByCategory} className={`${activeTab === "All" ? 'bg-pink-700' : "bg-green-900"}  hover:bg-pink-600 active:bg-green-700 focus:outline-none text-white rounded-xl px-3 py-1`}>All</button>
+          <button name='Frontend' onClick={filterDataByCategory} className={`${activeTab === "Frontend" ? 'bg-pink-700' : "bg-green-900"}  hover:bg-pink-600 active:bg-green-700 focus:outline-none text-white rounded-xl px-3 py-1`}>Frontend</button>
+          <button name='Backend' onClick={filterDataByCategory} className={`${activeTab === "Backend" ? 'bg-pink-700' : "bg-green-900"}  hover:bg-pink-600 active:bg-green-700 focus:outline-none text-white rounded-xl px-3 py-1`}>Backend</button>
         </div>
         <Modal opened={isDelete} onClose={() => { setIsDelete(false) }} title="Are you sure want to delete?">
           <div className="flex gap-4 justify-end">
